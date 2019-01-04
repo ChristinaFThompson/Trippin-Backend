@@ -29,6 +29,7 @@ API_KEY = "_zgpe0E9B_49nkcuC8d6Um0230IDE3Okwu0X01grMO_yYl4ZiElcTVpCoUbdd0cDQPu67
 
 
 # API constants, dont change.
+# const used to access yelp API
 API_HOST = 'https://api.yelp.com'
 SEARCH_PATH = '/v3/businesses/search'
 BUSINESS_PATH = '/v3/businesses/' # Business ID will come after slash.
@@ -40,7 +41,7 @@ DEFAULT_LOCATION = 'Washington, D.C.'
 DEFAULT_LAT = 38.994972
 DEFAULT_LONG = -77.024762
 SEARCH_LIMIT = 5
-DEFAULT_RADIUS = 10000
+DEFAULT_RADIUS = 500
 
 # yelp API view function
 
@@ -59,16 +60,14 @@ class ListRestaurants(APIView):
             headers = {
             'Authorization': 'Bearer %s' % API_KEY,
             }
-            print("CORRECT FUNCTION")
-            print(request.data)
             url_params = {
             'term': DEFAULT_TERM.replace(' ', '+'),
             'latitude': float(request.data["latitude"]),
             'longitude': float(request.data["longitude"]),
             'limit': SEARCH_LIMIT, 
             'radius': DEFAULT_RADIUS,
-            'sort_by': 'distance'
             }
+            # sends GET request yelp fusion api, response is stored in data, return data in JSON to frontend
             data = requests.request('GET', url, headers=headers, params=url_params)
             return Response(data.json(), status=status.HTTP_200_OK)
         else:
