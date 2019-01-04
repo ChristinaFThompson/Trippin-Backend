@@ -1,6 +1,6 @@
-from django.contrib.auth.models import User, Group
+from django.contrib.auth.models import Group
 from rest_framework import serializers
-from .models import Restaurant, Activity, Trip
+from .models import Restaurant, Activity, Trip, CustomUser, Location
 
 
 class UserSerializer(serializers.HyperlinkedModelSerializer):
@@ -13,7 +13,7 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
     )
     """
     class Meta:
-        model = User
+        model = CustomUser
         fields = ('id', 'email', 'username', 'groups')
 
 class GroupSerializer(serializers.HyperlinkedModelSerializer):
@@ -57,15 +57,14 @@ class TripSerializer(serializers.HyperlinkedModelSerializer):
         fields = ('username', 'date', 'memories')
 
 class ActivitySerializer(serializers.HyperlinkedModelSerializer):
-    """
-    restaurant = serializers.HyperlinkedRelatedField(
-        #view_restaurant='activity-detail',
-        many=True,
-        read_only=True,
-        view_name='activities'
-    )
-    """
+    
     class Meta:
         model = Activity
         fields = ('username', 'restaurant', 'trip')
+
+class LocationSerializer(serializers.HyperlinkedModelSerializer):
+    # list 10 restaurants via the Yelp API
+    class Meta:
+        model = Location
+        fields = ('longitude', 'latitude')
 

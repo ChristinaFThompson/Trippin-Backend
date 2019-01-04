@@ -41,11 +41,16 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'corsheaders',
-
+    'rest_auth',
+    'django.contrib.sites',
+    'allauth',
+    'allauth.account',
+    'rest_auth.registration'
 ]
-CORS_ORIGIN_WHITELIST = (
-    'http://localhost:3000/'
-)
+AUTH_USER_MODEL = 'trippin_backend.CustomUser'
+
+CORS_ORIGIN_ALLOW_ALL = True
+
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
@@ -91,7 +96,24 @@ DATABASES = {
         'HOST': 'localhost'
     }
 }
-
+# allows for HTTP methods to talk to server. client can now issue directives to server via REST
+REST_FRAMEWORK = {
+# Use Django's standard `django.contrib.auth` permissions,
+# or allow read-only access for unauthenticated users.
+'DEFAULT_PERMISSION_CLASSES': [
+'rest_framework.permissions.AllowAny',
+],
+"""
+'DEFAULT_AUTHENTICATION_CLASSES': [
+'rest_framework.authentication.TokenAuthentication',
+'rest_framework.authentication.SessionAuthentication'
+],
+"""
+'DEFAULT_RENDERER_CLASSES': [
+'rest_framework_jsonp.renderers.JSONPRenderer',
+'rest_framework.renderers.JSONRenderer',
+],
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/2.1/ref/settings/#auth-password-validators
