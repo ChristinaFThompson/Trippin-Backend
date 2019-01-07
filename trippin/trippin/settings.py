@@ -93,7 +93,7 @@ DATABASES = {
         'NAME': 'trippin',
         'USER': 'trippinuser',
         'PASSWORD': 'Trippin',
-        'HOST': 'localhost'
+        'HOST': 'postgres://napmilvmacsmim:46b1aa4715f54a90746b371b2bec53d202c5915cac34fead8d1d179ac9dcbe85@ec2-54-235-68-3.compute-1.amazonaws.com:5432/dbcc52alinrvm4'
     }
 }
 # allows for HTTP methods to talk to server. client can now issue directives to server via REST
