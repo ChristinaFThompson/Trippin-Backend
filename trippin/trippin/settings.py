@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/2.1/ref/settings/
 """
 
 import os
+import django_heroku
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -93,7 +94,7 @@ DATABASES = {
         'NAME': 'trippin',
         'USER': 'trippinuser',
         'PASSWORD': 'Trippin',
-        'HOST': 'postgres://napmilvmacsmim:46b1aa4715f54a90746b371b2bec53d202c5915cac34fead8d1d179ac9dcbe85@ec2-54-235-68-3.compute-1.amazonaws.com:5432/dbcc52alinrvm4'
+        'HOST': 'localhost'
     }
 }
 # allows for HTTP methods to talk to server. client can now issue directives to server via REST
@@ -151,4 +152,4 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
 
 STATIC_URL = '/static/'
-
+django_heroku.settings(locals())
