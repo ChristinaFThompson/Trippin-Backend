@@ -1,1 +1,1 @@
-web: gunicorn trippin.wsgi --pythonpath=trippin --log-file -
+web: gunicorn trippin.wsgi
