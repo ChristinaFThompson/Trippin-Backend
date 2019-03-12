@@ -3,18 +3,19 @@ from rest_framework import routers, serializers, viewsets
 from trippin_backend import views
 from django.contrib import admin
 from django.urls import path
+from django.urls import include, path
 
 
 router = routers.DefaultRouter()
-router.register(r'users', views.UserViewSet)
+#router.register(r'users', UserListView)
 router.register(r'groups', views.GroupViewSet)
+"""
 router.register(r'Trips', views.TripViewSet)
 router.register(r'Restaurants', views.RestaurantViewSet)
 router.register(r'Activities', views.ActivityViewSet)
 router.register(r'Locations', views.LocationViewSet)
-
-
-
+"""
+"""
 urlpatterns = [
     url(r'^', include('trippin_backend.urls')),
     url(r'^', include(router.urls)),
@@ -23,4 +24,9 @@ urlpatterns = [
     path('rest-auth/registration/', include('rest_auth.registration.urls')),
     path('admin/', admin.site.urls),
 ]
-
+"""
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    path('api/v1/', include('trippin_backend.urls')),
+    url(r'^', include(router.urls)),
+]

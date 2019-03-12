@@ -1,16 +1,10 @@
 from django.shortcuts import render
-# View is replaced w/API, will use react to issue commands 
-# Creating API views, can list data from model
-
-from rest_framework import viewsets
 from django.contrib.auth.models import Group
-from trippin_backend.serializers import UserSerializer
-from trippin_backend.serializers import RestaurantSerializer
-from trippin_backend.serializers import TripSerializer
-from trippin_backend.serializers import ActivitySerializer
-from trippin_backend.serializers import GroupSerializer
-from trippin_backend.serializers import LocationSerializer
-from rest_framework.views import APIView
+from .models import Restaurant, Activity, Trip, Location
+from users.models import CustomUser
+from rest_framework import viewsets
+from trippin_backend.serializers import GroupSerializer, RestaurantSerializer, ActivitySerializer, TripSerializer, LocationSerializer
+from users.serializers import UserSerializer
 
 import requests
 import urllib
@@ -22,28 +16,64 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 
+from rest_framework.authtoken.models import Token
 
-from .models import Activity, Restaurant, Trip, CustomUser, Location
+from rest_framework import generics
+from django.http import HttpResponse, JsonResponse
 
-API_KEY = "_zgpe0E9B_49nkcuC8d6Um0230IDE3Okwu0X01grMO_yYl4ZiElcTVpCoUbdd0cDQPu67IATiZ9kCISQWdSb5uvg0fc5e0nuhRhptQknSilDrzIXqRXr7Rm5eeQsXHYx" 
+API_KEY = "_zgpe0E9B_49nkcuC8d6Um0230IDE3Okwu0X01grMO_yYl4ZiElcTVpCoUbdd0cDQPu67IATiZ9kCISQWdSb5uvg0fc5e0nuhRhptQknSilDrzIXqRXr7Rm5eeQsXHYx"  
 
 
-# API constants, dont change.
-# const used to access yelp API
+# API constants, you shouldn't have to change these.
+
 API_HOST = 'https://api.yelp.com'
 SEARCH_PATH = '/v3/businesses/search'
-BUSINESS_PATH = '/v3/businesses/' # Business ID will come after slash.
-
-
-# Default example.
+BUSINESS_PATH = '/v3/businesses/'  # Business ID will come after slash.
 DEFAULT_TERM = 'restaurants'
-DEFAULT_LOCATION = 'Washington, D.C.'
-DEFAULT_LAT = 38.994972
-DEFAULT_LONG = -77.024762
 SEARCH_LIMIT = 5
-DEFAULT_RADIUS = 40000
+DEFAULT_RADIUS = 10000
 
-# yelp API view function
+# Create your views here.
+
+class GroupViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows groups to be viewed or edited.
+    """
+    queryset = Group.objects.all()
+    serializer_class = GroupSerializer
+
+
+class RestaurantViewSet(generics.ListCreateAPIView):
+    """
+    API endpoint that allows restaurants to be viewed or edited.
+    """
+    queryset = Restaurant.objects.all()
+    serializer_class = RestaurantSerializer
+
+
+class ActivityViewSet(generics.ListCreateAPIView):
+    """
+    API endpoint that allows activities to be viewed or edited.
+    """
+    queryset = Activity.objects.all()
+    serializer_class = ActivitySerializer
+
+
+class TripViewSet(generics.ListCreateAPIView):
+    """
+    API endpoint that allows trips to be viewed or edited.
+    """
+    queryset = Trip.objects.all()
+    serializer_class = TripSerializer
+
+
+class LocationViewSet(generics.ListCreateAPIView):
+    """
+    API endpoint that allows trips to be viewed or edited.
+    """
+    queryset = Location.objects.all()
+    serializer_class = LocationSerializer
+
 
 class ListRestaurants(APIView):
     """ 
@@ -53,52 +83,110 @@ class ListRestaurants(APIView):
     serializer_class = LocationSerializer
 
     def post(self, request, format='json'):
+        
         serializer = LocationSerializer(data=request.data)
         if serializer.is_valid():
             url_params = {}
             url = '{0}{1}'.format(API_HOST, quote(SEARCH_PATH.encode('utf8')))
             headers = {
-            'Authorization': 'Bearer %s' % API_KEY,
+                'Authorization': 'Bearer %s' % API_KEY,
             }
             url_params = {
-            'term': DEFAULT_TERM.replace(' ', '+'),
-            'latitude': float(request.data["latitude"]),
-            'longitude': float(request.data["longitude"]),
-            'limit': SEARCH_LIMIT, 
-            'radius': DEFAULT_RADIUS,
+                'term': DEFAULT_TERM.replace(' ', '+'),
+                'latitude': float(request.data["latitude"]),
+                'longitude': float(request.data["longitude"]),
+                'limit': SEARCH_LIMIT, 
+                'radius': DEFAULT_RADIUS,
+                'sort_by': 'distance'
             }
-            # sends GET request yelp fusion api, response is stored in data, return data in JSON to frontend
             data = requests.request('GET', url, headers=headers, params=url_params)
             return Response(data.json(), status=status.HTTP_200_OK)
         else:
-            print("\nINVALID DATA\n")
+            pass
 
-
-
-
-class UserViewSet(viewsets.ModelViewSet):
-    queryset = CustomUser.objects.all()
-    serializer_class = UserSerializer
-
-
-class GroupViewSet(viewsets.ModelViewSet):
-    queryset = Group.objects.all()
-    serializer_class = GroupSerializer
-
-class TripViewSet(viewsets.ModelViewSet):
+class CreateTrip(APIView):
+    """ 
+    Creates a trip.
+    """
     queryset = Trip.objects.all()
     serializer_class = TripSerializer
 
+    def post(self, request, format='json'):
 
-class RestaurantViewSet(viewsets.ModelViewSet):
+        trip = Trip(username=request.user, latitude=request.data["latitude"], longitude=request.data["longitude"] )
+        trip.save()
+
+        data = TripSerializer(trip)
+
+        return JsonResponse(data.data, safe=False)
+
+    """    
+    def get(self, request, format='json'):
+
+        trips = Trip.objects.all().filter(username=request.user)
+        print(trips)
+        for t in trip:
+            act = Activity.objects.all().filter
+            (pk)
+            ActivitySerializer(actions[0])
+            Activity.objects.all().filter(username=request.user)
+            food = Restaurant.objects.get(pk=data.data["restaurant_id"])
+        
+            data = RestaurantSerializer(food)
+        return JsonResponse(data.data, safe=False)
+    """
+
+class CreateRestaurant(APIView):
+    """ 
+    Creates a restaurant.
+    """
     queryset = Restaurant.objects.all()
     serializer_class = RestaurantSerializer
 
-class ActivityViewSet(viewsets.ModelViewSet):
+    def post(self, request, format='json'):
+
+        restaurant = Restaurant(phone=request.data["phone"], address=request.data["address"], name=request.data["eatery"])
+        restaurant.save()
+
+        data = RestaurantSerializer(restaurant)
+
+        return JsonResponse(data.data, safe=False)
+
+
+class CreateActivity(APIView):
+    """ 
+    Creates a restaurant.
+    """
     queryset = Activity.objects.all()
     serializer_class = ActivitySerializer
 
-class LocationViewSet(viewsets.ModelViewSet):
-    queryset = Location.objects.all()
-    serializer_class = LocationSerializer
+    def post(self, request, format='json'):
 
+        activity = Activity(username=request.user, restaurant=Restaurant.objects.get(pk=request.data["food"]), trip=Trip.objects.get(pk=request.data["vacay"]))
+        activity.save()
+
+        data = ActivitySerializer(activity)
+
+        return JsonResponse(data.data, safe=False)
+
+
+    def get(self, request, format='json'):
+
+        fun = []
+        food = []
+        display = []
+        trip = Trip.objects.all().filter(username=request.user).order_by('-date')
+        actions = Activity.objects.all().filter(trip=trip[0]).order_by('date')
+        
+        for a in actions:
+            fun.append(ActivitySerializer(a).data)
+
+        for f in fun:
+            food.append(Restaurant.objects.get(pk=f["restaurant_id"]))
+
+        for f in food:
+            display.append(RestaurantSerializer(f).data)
+
+        print(display)
+
+        return JsonResponse(display, safe=False)
